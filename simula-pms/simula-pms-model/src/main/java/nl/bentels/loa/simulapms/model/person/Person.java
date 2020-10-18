@@ -3,21 +3,25 @@ package nl.bentels.loa.simulapms.model.person;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Builder;
-import lombok.Data;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-@Data
+import lombok.Builder;
+import lombok.Value;
+
+@Value
 @Builder()
 public class Person {
 
-    private String                  id;
-    private final List<String>      firstNames;
-    private final List<String>      middleNames;
-    private final String            lastName;
-    private final Address           correspondenceAddress;
-    private final Address           billingAddress;
-    private final List<String>      emailAddresses;
-    private final List<PhoneNumber> phoneNumbers;
+    private String            id;
+    private List<String>      firstNames;
+    private List<String>      middleNames;
+    @NotEmpty
+    private String            lastName;
+    private Address           correspondenceAddress;
+    private Address           billingAddress;
+    private List<String>      emailAddresses;
+    private List<PhoneNumber> phoneNumbers;
 
     public Person withCorrectedFirstNames(final String... names) {
         return Person.builder()
@@ -45,7 +49,7 @@ public class Person {
                 .build();
     }
 
-    public Person withCorrectedLastName(final String name) {
+    public Person withCorrectedLastName(@NotEmpty final String name) {
         return Person.builder()
                 .id(getId())
                 .lastName(name)
@@ -58,7 +62,7 @@ public class Person {
                 .build();
     }
 
-    public Person withNewCorrespondenceAddress(final Address newAddress) {
+    public Person withNewCorrespondenceAddress(@NotNull final Address newAddress) {
         return Person.builder()
                 .id(getId())
                 .correspondenceAddress(newAddress)

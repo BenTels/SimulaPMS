@@ -1,5 +1,6 @@
 package nl.bentels.loa.simulapms.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import javax.validation.ConstraintViolationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -59,7 +62,7 @@ class PersonTest {
                 .builder().addressLines(List.of("Gryffindor House Commons Room",
                         "Hogwarts School of Witchcraft and Wizardry", "Little Winging"))
                 .countryCode(CountryCode.GB).build();
-        Person  mutated     = person.withNewCorrespondenceAddress(testAddress);
+        Person mutated = person.withNewCorrespondenceAddress(testAddress);
         assertTrue(
                 sameExceptInProperty(person, mutated, person.getClass().getMethod("getCorrespondenceAddress"),
                         testAddress),
@@ -74,7 +77,7 @@ class PersonTest {
                 .builder().addressLines(List.of("Gryffindor House Commons Room",
                         "Hogwarts School of Witchcraft and Wizardry", "Little Winging"))
                 .countryCode(CountryCode.GB).build();
-        Person  mutated     = person.withNewBillingAddress(testAddress);
+        Person mutated = person.withNewBillingAddress(testAddress);
         assertTrue(sameExceptInProperty(person, mutated, person.getClass().getMethod("getBillingAddress"),
                 testAddress),
                 () -> "Mutating billing addresses does not work correctly");
@@ -95,38 +98,46 @@ class PersonTest {
     @ArgumentsSource(PersonTestArgumentsSource.class)
     void whenPhoneNumbersCorrected_thenOkay(final Person person) throws NoSuchMethodException, SecurityException {
         PhoneNumber phoneNumber = new PhoneNumber("+31012345678", false);
-        Person      mutated     = person.withNewPhoneNumbers(phoneNumber);
+        Person mutated = person.withNewPhoneNumbers(phoneNumber);
         assertTrue(sameExceptInProperty(person, mutated, person.getClass().getMethod("getPhoneNumbers"),
                 List.of(phoneNumber)),
                 () -> "Mutating phone numbers does not work correctly");
     }
 
+    @ParameterizedTest
+    @DisplayName("When person's last name removed, then exception is thrown")
+    @ArgumentsSource(PersonTestArgumentsSource.class)
+    void whenLastNameDropped_thenException(final Person person) throws NoSuchMethodException, SecurityException {
+        assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(null));
+        assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(""));
+    }
+
     private boolean sameExceptInProperty(final Person expected, final Person actual,
             final Method expectedDifferenceMethod,
             final Object expectedDifferenceValue) {
-        boolean differenceIsAsExpected          = false;
+        boolean differenceIsAsExpected = false;
 
         boolean isSameInNonDifferenceProperties = Arrays.stream(Person.class.getMethods())
                 .filter(method -> method.getName().startsWith("get") && method.getParameterCount() == 0)
                 .filter(method -> !method.equals(expectedDifferenceMethod))
                 .map(method -> {
-                                                            try {
-                                                                Object expectedPropertyValue = method.invoke(expected);
-                                                                Object actualPropertyValue = method.invoke(actual);
-                                                                return Objects.equals(expectedPropertyValue,
-                                                                        actualPropertyValue);
-                                                            } catch (IllegalAccessException | IllegalArgumentException
-                                                                    | InvocationTargetException e) {
-                                                                throw new UnsupportedOperationException(
-                                                                        "Could not retrieve value for property "
-                                                                                + method.getName());
-                                                            }
-                                                        })
+                    try {
+                        Object expectedPropertyValue = method.invoke(expected);
+                        Object actualPropertyValue = method.invoke(actual);
+                        return Objects.equals(expectedPropertyValue,
+                                actualPropertyValue);
+                    } catch (IllegalAccessException | IllegalArgumentException
+                            | InvocationTargetException e) {
+                        throw new UnsupportedOperationException(
+                                "Could not retrieve value for property "
+                                        + method.getName());
+                    }
+                })
                 .reduce(true, Boolean::logicalAnd);
 
         try {
             Object expectedPropertyValue = expectedDifferenceMethod.invoke(expected);
-            Object actualPropertyValue   = expectedDifferenceMethod.invoke(actual);
+            Object actualPropertyValue = expectedDifferenceMethod.invoke(actual);
 
             differenceIsAsExpected = !Objects.equals(expectedPropertyValue, actualPropertyValue)
                     && Objects.equals(expectedDifferenceValue, actualPropertyValue);
