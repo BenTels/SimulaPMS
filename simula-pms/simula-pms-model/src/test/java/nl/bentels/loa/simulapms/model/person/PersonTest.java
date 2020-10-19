@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import javax.validation.ConstraintViolationException;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -110,6 +111,12 @@ class PersonTest {
     void whenLastNameDropped_thenException(final Person person) throws NoSuchMethodException, SecurityException {
         assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(null));
         assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(""));
+    }
+
+    @Test
+    @DisplayName("When person created without last name, then exception is thrown")
+    void whenLastNameDropped_thenException() throws NoSuchMethodException, SecurityException {
+        assertThrows(ConstraintViolationException.class, () -> Person.builder().id("BANG").build());
     }
 
     private boolean sameExceptInProperty(final Person expected, final Person actual,

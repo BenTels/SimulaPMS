@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<aspectj>
+	<aspects>
+		<aspect name="nl.bentels.loa.simulapms.model.validation.MethodValidationAspect" />
+		<aspect name="nl.bentels.loa.simulapms.model.validation.OnConstructionValidationAspect" />
+	</aspects>
+
+	<weaver options="-verbose">
+		<!-- Weave types that are within the javax.* or org.aspectj.* packages. 
+			Also weave all types in the foo package that do not have the @NoWeave annotation. -->
+		<include within="nl.bentels.loa.simulapms.model..*" />
+<!-- 		<include within="nl.bentels.loa.simulapms.model.person.*" /> -->
+<!-- 		<include within="nl.bentels.loa.simulapms.model.validation.*" /> -->
+
+		<!-- Do not weave types within the "bar" pakage -->
+<!-- 		<exclude within="nl.bentels.loa.simulapms.model.validation.*" /> -->
+
+		<!-- Dump all types within the "somepack" package, both before are after 
+			they are woven, to the "./_ajdump" folder on disk (for diagnostic purposes) -->
+		<dump within="nl.bentels.loa.simulapms.model..*" />
+<!-- 		<dump within="nl.bentels.loa.simulapms.model.person.*" /> -->
+<!-- 		<dump within="nl.bentels.loa.simulapms.model.validation.*" /> -->
+	</weaver>
+
+</aspectj>
