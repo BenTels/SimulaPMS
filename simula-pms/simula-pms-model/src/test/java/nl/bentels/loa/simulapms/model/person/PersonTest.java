@@ -1,10 +1,12 @@
 package nl.bentels.loa.simulapms.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +23,8 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import com.neovisionaries.i18n.CountryCode;
+
+import nl.bentels.loa.simulapms.model.person.Person.AgeClass;
 
 class PersonTest {
 
@@ -117,6 +121,21 @@ class PersonTest {
     @DisplayName("When person created without last name, then exception is thrown")
     void whenLastNameDropped_thenException() throws NoSuchMethodException, SecurityException {
         assertThrows(ConstraintViolationException.class, () -> Person.builder().id("BANG").build());
+    }
+
+    @Test
+    @DisplayName("When person created, then age class is correct")
+    void whenpersonCreated_thenAgeClassCorrect() throws NoSuchMethodException, SecurityException {
+        LocalDate infantAge = LocalDate.now().minusYears(1);
+        LocalDate childAge = LocalDate.now().minusYears(7);
+        LocalDate adultAge = LocalDate.now().minusYears(46);
+        LocalDate seniorAge = LocalDate.now().minusYears(75);
+
+        assertEquals(AgeClass.ADULT, Person.builder().id("NO_AGE").lastName("bliep").build().getAgeClassNow());
+        assertEquals(AgeClass.INFANT, Person.builder().id("NO_AGE").lastName("bliep").dateOfBirth(infantAge).build().getAgeClassNow());
+        assertEquals(AgeClass.CHILD, Person.builder().id("NO_AGE").lastName("bliep").dateOfBirth(childAge).build().getAgeClassNow());
+        assertEquals(AgeClass.ADULT, Person.builder().id("NO_AGE").lastName("bliep").dateOfBirth(adultAge).build().getAgeClassNow());
+        assertEquals(AgeClass.SENIOR, Person.builder().id("NO_AGE").lastName("bliep").dateOfBirth(seniorAge).build().getAgeClassNow());
     }
 
     private boolean sameExceptInProperty(final Person expected, final Person actual,

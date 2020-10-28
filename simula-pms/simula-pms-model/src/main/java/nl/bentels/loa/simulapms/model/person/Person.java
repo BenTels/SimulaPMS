@@ -1,5 +1,7 @@
 package nl.bentels.loa.simulapms.model.person;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +15,32 @@ import lombok.Value;
 @Builder()
 public class Person {
 
+    public static enum AgeClass {
+        INFANT(2),
+        CHILD(14),
+        ADULT(64),
+        SENIOR(Integer.MAX_VALUE);
+
+        private final int maxAge;
+
+        private AgeClass(final int maxAge) {
+            this.maxAge = maxAge;
+        }
+
+        static AgeClass findAgeClassGivenDateOfBirth(final LocalDate dateOfBirth) {
+            LocalDate currentDate = LocalDate.now();
+            return findAgeClassOnSpecificDate(dateOfBirth, currentDate);
+        }
+
+        static AgeClass findAgeClassOnSpecificDate(final LocalDate dateOfBirth, final LocalDate comparisonDate) {
+            long age = ChronoUnit.YEARS.between(dateOfBirth, comparisonDate);
+            return Arrays.stream(values())
+                    .filter(ac -> 0 <= age && age <= ac.maxAge)
+                    .findFirst()
+                    .orElse(ADULT);
+        }
+    }
+
     private String            id;
     private List<String>      firstNames;
     private List<String>      middleNames;
@@ -22,6 +50,15 @@ public class Person {
     private Address           billingAddress;
     private List<String>      emailAddresses;
     private List<PhoneNumber> phoneNumbers;
+    private LocalDate         dateOfBirth;
+
+    public AgeClass getAgeClassNow() {
+        return getAgeClassAtDateOfArrival(LocalDate.now());
+    }
+
+    private AgeClass getAgeClassAtDateOfArrival(@NotNull final LocalDate arrivalDate) {
+        return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
+    }
 
     public Person withCorrectedFirstNames(final String... names) {
         return Person.builder()
@@ -33,6 +70,7 @@ public class Person {
                 .correspondenceAddress(getCorrespondenceAddress())
                 .middleNames(getMiddleNames())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -46,6 +84,7 @@ public class Person {
                 .lastName(getLastName())
                 .correspondenceAddress(getCorrespondenceAddress())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -59,6 +98,7 @@ public class Person {
                 .middleNames(getMiddleNames())
                 .correspondenceAddress(getCorrespondenceAddress())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -72,6 +112,7 @@ public class Person {
                 .lastName(getLastName())
                 .middleNames(getMiddleNames())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -85,6 +126,7 @@ public class Person {
                 .lastName(getLastName())
                 .middleNames(getMiddleNames())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -98,6 +140,7 @@ public class Person {
                 .lastName(getLastName())
                 .middleNames(getMiddleNames())
                 .phoneNumbers(getPhoneNumbers())
+                .dateOfBirth(getDateOfBirth())
                 .build();
     }
 
@@ -111,6 +154,21 @@ public class Person {
                 .firstNames(getFirstNames())
                 .lastName(getLastName())
                 .middleNames(getMiddleNames())
+                .dateOfBirth(getDateOfBirth())
+                .build();
+    }
+
+    public Person withCorrectedDateOfBirth(final @NotNull LocalDate dateOfBirth) {
+        return Person.builder()
+                .id(getId())
+                .dateOfBirth(dateOfBirth)
+                .billingAddress(getBillingAddress())
+                .correspondenceAddress(getCorrespondenceAddress())
+                .emailAddresses(getEmailAddresses())
+                .firstNames(getFirstNames())
+                .lastName(getLastName())
+                .middleNames(getMiddleNames())
+                .phoneNumbers(getPhoneNumbers())
                 .build();
     }
 }

@@ -94,5 +94,6 @@
 	</dependencyManagement>
 	<modules>
 		<module>simula-pms-model</module>
+		<module>temp-rest-frontend</module>
 	</modules>
 </project>
