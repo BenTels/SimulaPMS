@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -28,6 +32,10 @@ public class PersonsResource {
             PersonDTO dto = new PersonDTO();
             dto.person = p;
             return dto;
+        }
+
+        Person getPerson() {
+            return person;
         }
 
         @JsonAnyGetter
@@ -219,8 +227,12 @@ public class PersonsResource {
 
     );
 
+    @CrossOrigin(origins = "http://localhost.localdomain:3000")
     @GetMapping(path = "/persons", produces = { "application/json", "application/xml" })
-    public List<PersonDTO> getPersons() {
-        return PERSONS_LIST;
+    public ResponseEntity<List<PersonDTO>> getPersons(@RequestParam(name = "searchTerm", defaultValue = "", required = false) final String filter) {
+        List<PersonDTO> filteredList = PERSONS_LIST.stream()
+                .filter(p -> StringUtils.isBlank(filter) || p.getPerson().getLastName().toLowerCase().contains(filter.trim().toLowerCase()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(filteredList);
     }
 }
