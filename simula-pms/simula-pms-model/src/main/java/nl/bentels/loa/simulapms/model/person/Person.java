@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -58,6 +59,25 @@ public class Person {
 
     private AgeClass getAgeClassAtDateOfArrival(@NotNull final LocalDate arrivalDate) {
         return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
+    }
+
+    public static Person fromTemplate(@NotNull final Person template) {
+        return fromTemplateWithId(template, UUID.randomUUID().toString());
+    }
+
+    public static Person fromTemplateWithId(@NotNull final Person template, @NotNull final String id) {
+        return Person.builder()
+                .id(id)
+                .firstNames(template.getFirstNames())
+                .billingAddress(template.getBillingAddress())
+                .emailAddresses(template.getEmailAddresses())
+                .lastName(template.getLastName())
+                .correspondenceAddress(template.getCorrespondenceAddress())
+                .middleNames(template.getMiddleNames())
+                .phoneNumbers(template.getPhoneNumbers())
+                .dateOfBirth(template.getDateOfBirth())
+                .build();
+
     }
 
     public Person withCorrectedFirstNames(final String... names) {
