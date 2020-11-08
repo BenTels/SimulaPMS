@@ -19,11 +19,116 @@ public class MethodValidationAspect {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.NotEmpty)(*), .. ))")
-    public void methodsWithNotEmptyParameters() {
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Null)(*), .. ))")
+    public void methodsWithNullConstraints() {
     }
 
-    @Pointcut("methodsWithNotEmptyParameters()")
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.NotNull)(*), .. ))")
+    public void methodsWithNotNullConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.AssertTrue)(*), .. ))")
+    public void methodsWithAssertTrueConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.AssertFalse)(*), .. ))")
+    public void methodsWithAssertFalseConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Min)(*), .. ))")
+    public void methodsWithMinConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Max)(*), .. ))")
+    public void methodsWithMaxConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.DecimalMin)(*), .. ))")
+    public void methodsWithDecimalMinConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.DecimalMax)(*), .. ))")
+    public void methodsWithDecimalMaxConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Negative)(*), .. ))")
+    public void methodsWithNegativeConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.NegativeOrZero)(*), .. ))")
+    public void methodsWithNegativeOrZeroConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Positive)(*), .. ))")
+    public void methodsWithPositiveConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.PositiveOrZero)(*), .. ))")
+    public void methodsWithPositiveOrZeroConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Size)(*), .. ))")
+    public void methodsWithSizeConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Digits)(*), .. ))")
+    public void methodsWithDigitsConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Past)(*), .. ))")
+    public void methodsWithPastConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.PastOrPresent)(*), .. ))")
+    public void methodsWithPastOrPresentConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Future)(*), .. ))")
+    public void methodsWithFutureConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.FutureOrPresent)(*), .. ))")
+    public void methodsWithFutureOrPresentConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Pattern)(*), .. ))")
+    public void methodsWithPatternConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.NotEmpty)(*), .. ))")
+    public void methodsWithNotEmptyConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.NotBlank)(*), .. ))")
+    public void methodsWithNotBlankConstraints() {
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model..*(.., @(javax.validation.constraints.Email)(*), .. ))")
+    public void methodsWithEmailConstraints() {
+    }
+
+    @Pointcut("methodsWithNullConstraints() || "
+            + "methodsWithNotNullConstraints() || "
+            + "methodsWithAssertTrueConstraints() || "
+            + "methodsWithAssertFalseConstraints() || "
+            + "methodsWithMinConstraints() || "
+            + "methodsWithMaxConstraints() || "
+            + "methodsWithDecimalMinConstraints() || "
+            + "methodsWithDecimalMaxConstraints() || "
+            + "methodsWithNegativeConstraints() || "
+            + "methodsWithNegativeOrZeroConstraints() || "
+            + "methodsWithPositiveConstraints() || "
+            + "methodsWithPositiveOrZeroConstraints() ||"
+            + "methodsWithSizeConstraints() ||"
+            + "methodsWithDigitsConstraints() ||"
+            + "methodsWithPastConstraints() ||"
+            + "methodsWithPastOrPresentConstraints() ||"
+            + "methodsWithFutureConstraints() ||"
+            + "methodsWithFutureOrPresentConstraints() ||"
+            + "methodsWithPatternConstraints() ||"
+            + "methodsWithNotEmptyConstraints() ||"
+            + "methodsWithNotBlankConstraints() ||"
+            + "methodsWithEmailConstraints()")
     public void methodsWithParametersWithValidationAnnotations() {
     }
 

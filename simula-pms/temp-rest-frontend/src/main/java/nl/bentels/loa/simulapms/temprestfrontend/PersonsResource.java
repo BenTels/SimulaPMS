@@ -104,24 +104,52 @@ public class PersonsResource {
             return Person.builder()
                     .id((String) map.get("id"))
                     .lastName((String) map.get("lastname"))
-                    .firstNames((List<String>) map.get("firstnames"))
-                    .middleNames((List<String>) map.get("middlenames"))
-                    .emailAddresses((List<String>) map.get("emailaddresses"))
+                    .firstNames(emptyListObjectToNull("firstnames"))
+                    .middleNames(emptyListObjectToNull("middlenames"))
+                    .emailAddresses(emptyListObjectToNull("emailaddresses"))
                     .dateOfBirth(toLocalDate((String) map.get("dob")))
-                    .phoneNumbers(((List<Map<String, Object>>) map.getOrDefault("phonenumbers", List.of())).stream()
-                            .map(pnm -> new PhoneNumber((String) pnm.get("number"), (Boolean) pnm.get("mobile"))).collect(Collectors.toList()))
+                    .phoneNumbers(phoneNumbersToList())
                     .correspondenceAddress(toAddress((Map<String, Object>) map.get("mainCorrespondenceAddress")))
                     .billingAddress(toAddress((Map<String, Object>) map.get("billingAddress")))
                     .build();
 
         }
 
+        private List<PhoneNumber> phoneNumbersToList() {
+            List<PhoneNumber> list = ((List<Map<String, Object>>) map.getOrDefault("phonenumbers", List.of())).stream()
+                    .filter(pnm -> StringUtils.isNotBlank((String) pnm.get("number")))
+                    .map(pnm -> new PhoneNumber((String) pnm.get("number"), (Boolean) pnm.get("mobile")))
+                    .collect(Collectors.toList());
+            return list.isEmpty() ? null : list;
+        }
+
+        private List<String> emptyListObjectToNull(final String objectKey) {
+            List<String> potentialList = (List<String>) map.get(objectKey);
+            potentialList = emptyListToNull(potentialList);
+            return potentialList;
+        }
+
+        private List<String> emptyListToNull(final List<String> potentialList) {
+            List<String> resultList = potentialList;
+            if (potentialList != null) {
+                if (potentialList.isEmpty() || (potentialList.stream().filter(StringUtils::isNotBlank).count() == 0)) {
+                    resultList = null;
+                }
+            }
+            return resultList;
+        }
+
         private Address toAddress(final Map<String, Object> addressMap) {
-            return addressMap != null ? Address.builder()
-                    .countryCode(CountryCode.valueOf((String) addressMap.get("country")))
-                    .addressLines((List<String>) addressMap.get("lines"))
-                    .build()
-                    : null;
+            if (addressMap == null) {
+                return null;
+            } else {
+                CountryCode countryCode = CountryCode.valueOf((String) addressMap.get("country"));
+                List<String> addressLines = emptyListToNull((List<String>) addressMap.get("lines"));
+                return countryCode != null && addressLines != null ? Address.builder()
+                        .countryCode(countryCode)
+                        .addressLines(addressLines)
+                        .build() : null;
+            }
         }
 
         private LocalDate toLocalDate(final String dateString) {

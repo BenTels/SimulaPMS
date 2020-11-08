@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -45,7 +46,7 @@ public class Person {
     private String            id;
     private List<String>      firstNames;
     private List<String>      middleNames;
-    @NotEmpty
+    @NotBlank
     private String            lastName;
     private Address           correspondenceAddress;
     private Address           billingAddress;
@@ -57,7 +58,7 @@ public class Person {
         return getAgeClassAtDateOfArrival(LocalDate.now());
     }
 
-    private AgeClass getAgeClassAtDateOfArrival(@NotNull final LocalDate arrivalDate) {
+    private AgeClass getAgeClassAtDateOfArrival(final LocalDate arrivalDate) {
         return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
     }
 
@@ -66,6 +67,11 @@ public class Person {
     }
 
     public static Person fromTemplateWithId(@NotNull final Person template, @NotNull final String id) {
+        return builderFromTemplateWithId(template, id)
+                .build();
+    }
+
+    private static PersonBuilder builderFromTemplateWithId(final Person template, final String id) {
         return Person.builder()
                 .id(id)
                 .firstNames(template.getFirstNames())
@@ -75,120 +81,54 @@ public class Person {
                 .correspondenceAddress(template.getCorrespondenceAddress())
                 .middleNames(template.getMiddleNames())
                 .phoneNumbers(template.getPhoneNumbers())
-                .dateOfBirth(template.getDateOfBirth())
-                .build();
-
+                .dateOfBirth(template.getDateOfBirth());
     }
 
     public Person withCorrectedFirstNames(final String... names) {
-        return Person.builder()
-                .id(getId())
-                .firstNames(Arrays.asList(names))
-                .billingAddress(getBillingAddress())
-                .emailAddresses(getEmailAddresses())
-                .lastName(getLastName())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .middleNames(getMiddleNames())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("firstNames", Arrays.asList(names));
     }
 
     public Person withCorrectedMiddleNames(final String... names) {
-        return Person.builder()
-                .id(getId())
-                .middleNames(Arrays.asList(names))
-                .billingAddress(getBillingAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("middleNames", Arrays.asList(names));
     }
 
     public Person withCorrectedLastName(@NotEmpty final String name) {
-        return Person.builder()
-                .id(getId())
-                .lastName(name)
-                .billingAddress(getBillingAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .middleNames(getMiddleNames())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("lastName", name);
     }
 
     public Person withNewCorrespondenceAddress(@NotNull final Address newAddress) {
-        return Person.builder()
-                .id(getId())
-                .correspondenceAddress(newAddress)
-                .billingAddress(getBillingAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .middleNames(getMiddleNames())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("correspondenceAddress", newAddress);
     }
 
     public Person withNewBillingAddress(final Address newAddress) {
-        return Person.builder()
-                .id(getId())
-                .billingAddress(newAddress)
-                .correspondenceAddress(getCorrespondenceAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .middleNames(getMiddleNames())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("billingAddress", newAddress);
     }
 
     public Person withNewEmailAddresses(final String... emailAddresses) {
-        return Person.builder()
-                .id(getId())
-                .emailAddresses(Arrays.asList(emailAddresses))
-                .billingAddress(getBillingAddress())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .middleNames(getMiddleNames())
-                .phoneNumbers(getPhoneNumbers())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("emailAddresses", Arrays.asList(emailAddresses));
     }
 
     public Person withNewPhoneNumbers(final PhoneNumber... phoneNumbers) {
-        return Person.builder()
-                .id(getId())
-                .phoneNumbers(Arrays.asList(phoneNumbers))
-                .billingAddress(getBillingAddress())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .middleNames(getMiddleNames())
-                .dateOfBirth(getDateOfBirth())
-                .build();
+        return withMutatedField("phoneNumbers", Arrays.asList(phoneNumbers));
     }
 
     public Person withCorrectedDateOfBirth(final @NotNull LocalDate dateOfBirth) {
-        return Person.builder()
-                .id(getId())
-                .dateOfBirth(dateOfBirth)
-                .billingAddress(getBillingAddress())
-                .correspondenceAddress(getCorrespondenceAddress())
-                .emailAddresses(getEmailAddresses())
-                .firstNames(getFirstNames())
-                .lastName(getLastName())
-                .middleNames(getMiddleNames())
-                .phoneNumbers(getPhoneNumbers())
-                .build();
+        return withMutatedField("dateOfBirth", dateOfBirth);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Person withMutatedField(final String fieldName, final Object newValue) {
+        PersonBuilder builder = builderFromTemplateWithId(this, getId());
+        switch (fieldName) {
+        case "firstNames" -> builder.firstNames((List<String>) newValue);
+        case "middleNames" -> builder.middleNames((List<String>) newValue);
+        case "lastName" -> builder.lastName((String) newValue);
+        case "correspondenceAddress" -> builder.correspondenceAddress((Address) newValue);
+        case "billingAddress" -> builder.billingAddress((Address) newValue);
+        case "emailAddresses" -> builder.emailAddresses((List<String>) newValue);
+        case "phoneNumbers" -> builder.phoneNumbers((List<PhoneNumber>) newValue);
+        case "dateOfBirth" -> builder.dateOfBirth((LocalDate) newValue);
+        }
+        return builder.build();
     }
 }

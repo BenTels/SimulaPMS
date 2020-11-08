@@ -26,7 +26,8 @@ public class OnConstructionValidationAspect {
         Set<ConstraintViolation<Object>> violations = validator.validate(retval);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(
-                    String.format("Validation constraint failed on construction of class %s", joinPoint.getStaticPart().getSignature().getDeclaringType().getName()),
+                    String.format("Validation constraint failed on construction of class %s: %s", joinPoint.getStaticPart().getSignature().getDeclaringType().getName(),
+                            violations),
                     violations);
         }
     }

@@ -115,12 +115,29 @@ class PersonTest {
     void whenLastNameDropped_thenException(final Person person) throws NoSuchMethodException, SecurityException {
         assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(null));
         assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(""));
+        assertThrows(ConstraintViolationException.class, () -> person.withCorrectedLastName(" "));
+    }
+
+    @ParameterizedTest
+    @DisplayName("When person's date of birth removed, then exception is thrown")
+    @ArgumentsSource(PersonTestArgumentsSource.class)
+    void whenDOBDropped_thenException(final Person person) throws NoSuchMethodException, SecurityException {
+        assertThrows(ConstraintViolationException.class, () -> person.withCorrectedDateOfBirth(null));
+    }
+
+    @ParameterizedTest
+    @DisplayName("When address set without country, then exception is thrown")
+    @ArgumentsSource(PersonTestArgumentsSource.class)
+    void whenNoCountryOnAddress_thenException(final Person person) throws NoSuchMethodException, SecurityException {
+        assertThrows(ConstraintViolationException.class, () -> person.withNewBillingAddress(Address.builder().addressLines(List.of("test 0", "test 1")).build()));
     }
 
     @Test
     @DisplayName("When person created without last name, then exception is thrown")
     void whenLastNameDropped_thenException() throws NoSuchMethodException, SecurityException {
         assertThrows(ConstraintViolationException.class, () -> Person.builder().id("BANG").build());
+        assertThrows(ConstraintViolationException.class, () -> Person.builder().id("BANG").lastName("").build());
+        assertThrows(ConstraintViolationException.class, () -> Person.builder().id("BANG").lastName("   ").build());
     }
 
     @Test
