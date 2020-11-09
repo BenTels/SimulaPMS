@@ -16,16 +16,23 @@ import javax.validation.ConstraintViolationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableLoadTimeWeaving;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.neovisionaries.i18n.CountryCode;
 
 import nl.bentels.loa.simulapms.model.person.Person.AgeClass;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = PersonTestConfig.class)
 class PersonTest {
 
     @ParameterizedTest
@@ -192,6 +199,12 @@ class PersonTest {
 
         return isSameInNonDifferenceProperties && differenceIsAsExpected;
     }
+
+}
+
+@Configuration
+@EnableLoadTimeWeaving
+class PersonTestConfig {
 
 }
 
