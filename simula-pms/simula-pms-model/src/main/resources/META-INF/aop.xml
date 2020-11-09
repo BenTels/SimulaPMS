@@ -3,6 +3,7 @@
 	<aspects>
 		<aspect name="nl.bentels.loa.simulapms.model.validation.MethodValidationAspect" />
 		<aspect name="nl.bentels.loa.simulapms.model.validation.OnConstructionValidationAspect" />
+		<aspect name="nl.bentels.loa.simulapms.model.person.PersonRepositoryAccessProvidingAspect" />
 	</aspects>
 
 	<weaver options="-verbose">

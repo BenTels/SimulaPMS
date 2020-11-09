@@ -162,6 +162,12 @@ class PersonTest {
         assertEquals(AgeClass.SENIOR, Person.builder().id("NO_AGE").lastName("bliep").dateOfBirth(seniorAge).build().getAgeClassNow());
     }
 
+    @Test
+    public void whenMixinApplied_thenNewMethodAvailable() {
+        Person p = Person.findById("whatever");
+        assertEquals("whatever", p.getId());
+    }
+
     private boolean sameExceptInProperty(final Person expected, final Person actual,
             final Method expectedDifferenceMethod,
             final Object expectedDifferenceValue) {

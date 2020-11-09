@@ -54,12 +54,8 @@ public class Person {
     private List<PhoneNumber> phoneNumbers;
     private LocalDate         dateOfBirth;
 
-    public AgeClass getAgeClassNow() {
-        return getAgeClassAtDateOfArrival(LocalDate.now());
-    }
-
-    private AgeClass getAgeClassAtDateOfArrival(final LocalDate arrivalDate) {
-        return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
+    public static Person findById(final String id) {
+        return Person.builder().id("UNKNOWN").lastName("Unknown").build();
     }
 
     public static Person fromTemplate(@NotNull final Person template) {
@@ -82,6 +78,14 @@ public class Person {
                 .middleNames(template.getMiddleNames())
                 .phoneNumbers(template.getPhoneNumbers())
                 .dateOfBirth(template.getDateOfBirth());
+    }
+
+    public AgeClass getAgeClassNow() {
+        return getAgeClassAtDateOfArrival(LocalDate.now());
+    }
+
+    private AgeClass getAgeClassAtDateOfArrival(final LocalDate arrivalDate) {
+        return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
     }
 
     public Person withCorrectedFirstNames(final String... names) {
