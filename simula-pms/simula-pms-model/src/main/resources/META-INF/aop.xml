@@ -6,7 +6,7 @@
 		<aspect name="nl.bentels.loa.simulapms.model.person.PersonRepositoryAccessProvidingAspect" />
 	</aspects>
 
-	<weaver options="-verbose">
+	<weaver options="-verbose -Xreweavable -showWeaveInfo">
 		<!-- Weave types that are within the javax.* or org.aspectj.* packages. 
 			Also weave all types in the foo package that do not have the @NoWeave annotation. -->
 		<include within="nl.bentels.loa.simulapms.model..*" />

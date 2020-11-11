@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableLoadTimeWeaving;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -163,7 +164,7 @@ class PersonTest {
     }
 
     @Test
-    public void whenMixinApplied_thenNewMethodAvailable() {
+    public void whenPersonRetrievedById_thenNewMethodAvailable() {
         Person p = Person.findById("whatever");
         assertEquals("whatever", p.getId());
     }
@@ -209,6 +210,7 @@ class PersonTest {
 }
 
 @Configuration
+@ImportResource("classpath:/META-INF/spring/model/test-config.xml")
 @EnableLoadTimeWeaving
 class PersonTestConfig {
 

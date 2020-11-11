@@ -55,7 +55,11 @@ public class Person {
     private LocalDate         dateOfBirth;
 
     public static Person findById(final String id) {
-        return Person.builder().id("UNKNOWN").lastName("Unknown").build();
+        return null;
+    }
+
+    public static List<Person> findAllOfThem() {
+        return null;
     }
 
     public static Person fromTemplate(@NotNull final Person template) {
