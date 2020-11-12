@@ -75,7 +75,7 @@ class PersonTest {
                 .builder().addressLines(List.of("Gryffindor House Commons Room",
                         "Hogwarts School of Witchcraft and Wizardry", "Little Winging"))
                 .countryCode(CountryCode.GB).build();
-        Person mutated = person.withNewCorrespondenceAddress(testAddress);
+        Person mutated = person.withCorrectedCorrespondenceAddress(testAddress);
         assertTrue(
                 sameExceptInProperty(person, mutated, person.getClass().getMethod("getCorrespondenceAddress"),
                         testAddress),
@@ -90,7 +90,7 @@ class PersonTest {
                 .builder().addressLines(List.of("Gryffindor House Commons Room",
                         "Hogwarts School of Witchcraft and Wizardry", "Little Winging"))
                 .countryCode(CountryCode.GB).build();
-        Person mutated = person.withNewBillingAddress(testAddress);
+        Person mutated = person.withCorrectedBillingAddress(testAddress);
         assertTrue(sameExceptInProperty(person, mutated, person.getClass().getMethod("getBillingAddress"),
                 testAddress),
                 () -> "Mutating billing addresses does not work correctly");
@@ -100,7 +100,7 @@ class PersonTest {
     @DisplayName("When person's email addresses corrected, then all other fields remain unchanged")
     @ArgumentsSource(PersonTestArgumentsSource.class)
     void whenEmailAddressesCorrected_thenOkay(final Person person) throws NoSuchMethodException, SecurityException {
-        Person mutated = person.withNewEmailAddresses("new@newlynew.com");
+        Person mutated = person.withCorrectedEmailAddresses("new@newlynew.com");
         assertTrue(sameExceptInProperty(person, mutated, person.getClass().getMethod("getEmailAddresses"),
                 List.of("new@newlynew.com")),
                 () -> "Mutating email addresses does not work correctly");
@@ -111,7 +111,7 @@ class PersonTest {
     @ArgumentsSource(PersonTestArgumentsSource.class)
     void whenPhoneNumbersCorrected_thenOkay(final Person person) throws NoSuchMethodException, SecurityException {
         PhoneNumber phoneNumber = new PhoneNumber("+31012345678", false);
-        Person mutated = person.withNewPhoneNumbers(phoneNumber);
+        Person mutated = person.withCorrectedPhoneNumbers(phoneNumber);
         assertTrue(sameExceptInProperty(person, mutated, person.getClass().getMethod("getPhoneNumbers"),
                 List.of(phoneNumber)),
                 () -> "Mutating phone numbers does not work correctly");
@@ -137,7 +137,7 @@ class PersonTest {
     @DisplayName("When address set without country, then exception is thrown")
     @ArgumentsSource(PersonTestArgumentsSource.class)
     void whenNoCountryOnAddress_thenException(final Person person) throws NoSuchMethodException, SecurityException {
-        assertThrows(ConstraintViolationException.class, () -> person.withNewBillingAddress(Address.builder().addressLines(List.of("test 0", "test 1")).build()));
+        assertThrows(ConstraintViolationException.class, () -> person.withCorrectedBillingAddress(Address.builder().addressLines(List.of("test 0", "test 1")).build()));
     }
 
     @Test

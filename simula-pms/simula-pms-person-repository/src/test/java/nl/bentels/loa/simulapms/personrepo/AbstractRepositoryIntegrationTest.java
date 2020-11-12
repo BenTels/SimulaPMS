@@ -9,7 +9,6 @@ import org.opentest4j.MultipleFailuresError;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -30,7 +29,7 @@ import nl.bentels.loa.simulapms.personrepo.AbstractRepositoryIntegrationTest.Tes
 public abstract class AbstractRepositoryIntegrationTest {
 
     @Configuration
-    @ImportResource("classpath:/META-INF/spring/model/integration-test-config.xml")
+//    @ImportResource("classpath:/META-INF/spring/model/integration-test-config.xml")
     protected static class TestMongoConfiguration extends AbstractMongoClientConfiguration {
         private static final String CONN_STRING = "mongodb+srv://cluster-bzt-test-0.ew5ad.mongodb.net/admin";
         private static final String USERNAME    = "bzt";
@@ -55,7 +54,7 @@ public abstract class AbstractRepositoryIntegrationTest {
         }
     }
 
-    protected void assertTels(Person tels) throws MultipleFailuresError {
+    protected void assertTels(final Person tels) throws MultipleFailuresError {
         assertAll(
                 () -> assertEquals("5f5f6c1c5fc0d0741b9c7732", tels.getId()),
                 () -> assertEquals("Tels", tels.getLastName()),

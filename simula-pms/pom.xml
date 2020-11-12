@@ -128,5 +128,6 @@
 		<module>simula-pms-model</module>
 		<module>temp-rest-frontend</module>
 		<module>simula-pms-person-repository</module>
+		<module>simula-pms-rest-frontend</module>
 	</modules>
 </project>

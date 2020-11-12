@@ -7,4 +7,10 @@ public interface PersonRepository {
     List<Person> findAll();
 
     Person findById(String id) throws NoSuchPersonException;
+
+    void create(Person newPerson);
+
+    void update(Person person);
+
+    void remove(Person person);
 }

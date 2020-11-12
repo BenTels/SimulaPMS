@@ -13,4 +13,19 @@ public class TemporaryPersonRepository implements PersonRepository {
     public List<Person> findAll() {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    @Override
+    public void create(final Person newPerson) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void update(final Person person) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void remove(final Person person) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

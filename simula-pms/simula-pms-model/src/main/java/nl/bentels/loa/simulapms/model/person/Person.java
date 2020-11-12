@@ -92,6 +92,14 @@ public class Person {
         return getDateOfBirth() != null ? AgeClass.findAgeClassOnSpecificDate(getDateOfBirth(), arrivalDate) : AgeClass.ADULT;
     }
 
+    public Person makeLike(final Person updateTemplate) {
+        return fromTemplateWithId(updateTemplate, getId());
+    }
+
+    public Person delete() {
+        return Person.builder().id(getId()).lastName("DELETED").build();
+    }
+
     public Person withCorrectedFirstNames(final String... names) {
         return withMutatedField("firstNames", Arrays.asList(names));
     }
@@ -104,19 +112,19 @@ public class Person {
         return withMutatedField("lastName", name);
     }
 
-    public Person withNewCorrespondenceAddress(@NotNull final Address newAddress) {
+    public Person withCorrectedCorrespondenceAddress(@NotNull final Address newAddress) {
         return withMutatedField("correspondenceAddress", newAddress);
     }
 
-    public Person withNewBillingAddress(final Address newAddress) {
+    public Person withCorrectedBillingAddress(final Address newAddress) {
         return withMutatedField("billingAddress", newAddress);
     }
 
-    public Person withNewEmailAddresses(final String... emailAddresses) {
+    public Person withCorrectedEmailAddresses(final String... emailAddresses) {
         return withMutatedField("emailAddresses", Arrays.asList(emailAddresses));
     }
 
-    public Person withNewPhoneNumbers(final PhoneNumber... phoneNumbers) {
+    public Person withCorrectedPhoneNumbers(final PhoneNumber... phoneNumbers) {
         return withMutatedField("phoneNumbers", Arrays.asList(phoneNumbers));
     }
 

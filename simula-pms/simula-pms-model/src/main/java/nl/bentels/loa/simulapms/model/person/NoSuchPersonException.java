@@ -1,6 +1,6 @@
 package nl.bentels.loa.simulapms.model.person;
 
-public class NoSuchPersonException extends Exception {
+public class NoSuchPersonException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
