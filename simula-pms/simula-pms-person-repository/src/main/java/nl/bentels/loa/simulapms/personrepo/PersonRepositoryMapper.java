@@ -2,6 +2,7 @@ package nl.bentels.loa.simulapms.personrepo;
 
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import nl.bentels.loa.simulapms.model.person.Person;
 import nl.bentels.loa.simulapms.personrepo.model.Address;
@@ -21,6 +22,7 @@ public interface PersonRepositoryMapper {
     @InheritInverseConfiguration
     nl.bentels.loa.simulapms.model.person.Address fromRepoAddress(Address address);
 
+    @Mapping(target = "mainCorrespondenceAddress", source = "correspondenceAddress")
     PersonDocument toRepoPerson(Person person);
 
     @InheritInverseConfiguration

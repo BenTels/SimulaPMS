@@ -8,4 +8,7 @@
 	    http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<bean id="person-aspect" class="nl.bentels.loa.simulapms.model.person.PersonRepositoryAccessProvidingAspect" factory-method="aspectOf"/>	
+
+	<bean id="person-repo" class="nl.bentels.loa.simulapms.model.person.TemporaryPersonRepository"/>
+
 </beans>

@@ -20,4 +20,5 @@ public class PersonDocument {
     private Address           billingAddress;
     private List<String>      emailAddresses;
     private List<PhoneNumber> phoneNumbers;
+    private String            dateOfBirth;
 }

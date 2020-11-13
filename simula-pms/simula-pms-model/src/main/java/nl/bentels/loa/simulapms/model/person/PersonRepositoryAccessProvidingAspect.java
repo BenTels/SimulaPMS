@@ -18,7 +18,6 @@ public class PersonRepositoryAccessProvidingAspect {
     @Autowired
     private PersonRepository    repository;
 
-//    @Pointcut("call(static * nl.bentels.loa.simulapms.model.person.Person.fromTemplateWithId(..))")
     @Pointcut("call(static * nl.bentels.loa.simulapms.model.person.Person.fromTemplateWithId(..)) && !withincode(Person nl.bentels.loa.simulapms.model.person.Person.makeLike(..))")
     public void personCreation() {
     }
