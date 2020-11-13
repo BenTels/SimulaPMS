@@ -1,6 +1,7 @@
 package nl.bentels.loa.simulapms.model.validation;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -146,16 +147,24 @@ public class MethodValidationAspect {
         Set<ConstraintViolation<Object>> violations = startValidation(thisJoinPoint, method);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(
-                    String.format("Constraints violated on method or constructor %s of type %s", method.getName(), thisJoinPoint.getTarget().getClass()),
+                    String.format("Constraints violated on method or constructor %s of type %s", method.getName(), getInvocationTargetObject(thisJoinPoint).getClass()),
                     violations);
         }
     }
 
     private Set<ConstraintViolation<Object>> startValidation(final JoinPoint thisJoinPoint, final Method method) {
         return validator.forExecutables().validateParameters(
-                thisJoinPoint.getTarget(),
+                getInvocationTargetObject(thisJoinPoint),
                 method,
                 thisJoinPoint.getArgs());
+    }
+
+    private Object getInvocationTargetObject(final JoinPoint thisJoinPoint) {
+        Object target = thisJoinPoint.getTarget();
+        if (target == null && Modifier.isStatic(thisJoinPoint.getSignature().getModifiers())) {
+            target = thisJoinPoint.getSignature().getDeclaringType();
+        }
+        return target;
     }
 
     private Method findAdvisedMethodObject(final JoinPoint thisJoinPoint) throws NoSuchMethodException {

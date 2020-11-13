@@ -18,15 +18,18 @@ public class PersonRepositoryAccessProvidingAspect {
     @Autowired
     private PersonRepository    repository;
 
-    @Pointcut("execution(static * nl.bentels.loa.simulapms.model.person.Person.fromTemplate*(..)) && !within(nl.bentels.loa.simulapms.model.person.Person)")
+//    @Pointcut("call(static * nl.bentels.loa.simulapms.model.person.Person.fromTemplateWithId(..))")
+    @Pointcut("call(static * nl.bentels.loa.simulapms.model.person.Person.fromTemplateWithId(..)) && !withincode(Person nl.bentels.loa.simulapms.model.person.Person.makeLike(..))")
     public void personCreation() {
     }
 
     @Around("personCreation()")
     public Person persistOnPersonCreation(final ProceedingJoinPoint pjp) {
+        LOGGER.debug("Will create person");
         Object[] args = pjp.getArgs();
         try {
             Person newPerson = (Person) pjp.proceed(args);
+            LOGGER.debug("Will create person {}", newPerson);
             repository.create(newPerson);
             return newPerson;
         } catch (AlreadyIdentifiedPersonException aipe) {
