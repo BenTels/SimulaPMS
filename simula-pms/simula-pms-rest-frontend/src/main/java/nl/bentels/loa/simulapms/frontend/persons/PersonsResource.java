@@ -1,5 +1,6 @@
 package nl.bentels.loa.simulapms.frontend.persons;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -28,13 +29,15 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neovisionaries.i18n.CountryCode;
 
+import nl.bentels.loa.simulapms.frontend.persons.PersonWebSocketTopic.ChangeType;
 import nl.bentels.loa.simulapms.model.person.Address;
 import nl.bentels.loa.simulapms.model.person.AlreadyIdentifiedPersonException;
+import nl.bentels.loa.simulapms.model.person.NoSuchPersonException;
 import nl.bentels.loa.simulapms.model.person.Person;
 import nl.bentels.loa.simulapms.model.person.PhoneNumber;
 
 @RestController
-@CrossOrigin(origins = "http://localhost.localdomain:3000")
+@CrossOrigin(origins = "http://localhost.localdomain:3000", exposedHeaders = "Location")
 public class PersonsResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonsResource.class);
@@ -105,11 +108,15 @@ public class PersonsResource {
         }
 
         private List<PhoneNumber> phoneNumbersToList() {
-            List<PhoneNumber> list = ((List<Map<String, Object>>) map.getOrDefault("phonenumbers", List.of())).stream()
-                    .filter(pnm -> StringUtils.isNotBlank((String) pnm.get("number")))
-                    .map(pnm -> new PhoneNumber((String) pnm.get("number"), (Boolean) pnm.get("mobile")))
-                    .collect(Collectors.toList());
-            return list.isEmpty() ? null : list;
+            Object list0 = map.getOrDefault("phonenumbers", List.of());
+            if (list0 != null) {
+                List<PhoneNumber> list = ((List<Map<String, Object>>) list0).stream()
+                        .filter(pnm -> StringUtils.isNotBlank((String) pnm.get("number")))
+                        .map(pnm -> new PhoneNumber((String) pnm.get("number"), (Boolean) pnm.get("mobile")))
+                        .collect(Collectors.toList());
+                return list.isEmpty() ? null : list;
+            }
+            return null;
         }
 
         private List<String> emptyListObjectToNull(final String objectKey) {
@@ -168,6 +175,16 @@ public class PersonsResource {
         return ResponseEntity.ok(filteredList);
     }
 
+    @GetMapping(path = "/persons/{id}", produces = { "application/json" })
+    public ResponseEntity<PersonDTO> getPerson(@PathVariable(name = "id", required = true) final String id) {
+        LOGGER.debug("Going to retrieve person with id [{}]", id);
+        Person person = Person.findById(id);
+        if (person != null) {
+            return ResponseEntity.ok(PersonDTO.of(person));
+        }
+        throw new NoSuchPersonException(id);
+    }
+
     @PostMapping(path = "/persons", consumes = { "application/json" })
     public ResponseEntity<Void> createPerson(@RequestBody(required = true) final PersonDTO personDTO, final UriComponentsBuilder componentsBuilder) {
         Person person = personDTO.getPerson();
@@ -176,21 +193,28 @@ public class PersonsResource {
             throw new AlreadyIdentifiedPersonException();
         } else {
             Person newPerson = Person.fromTemplate(person);
-            return ResponseEntity.created(componentsBuilder.pathSegment("persons", newPerson.getId()).build().toUri()).build();
+            URI uri = componentsBuilder.pathSegment("persons", newPerson.getId()).build().toUri();
+            PersonWebSocketTopic.enqueueNotification(ChangeType.ADDED, uri);
+            return ResponseEntity.created(uri).build();
         }
     }
 
     @PutMapping(path = "/persons/{id}", consumes = { "application/json" })
     @ResponseStatus(code = HttpStatus.OK)
-    public void updatePerson(@RequestBody(required = true) final PersonDTO personDTO, @PathVariable(name = "id", required = true) final String id) {
+    public void updatePerson(@RequestBody(required = true) final PersonDTO personDTO, @PathVariable(name = "id", required = true) final String id,
+            final UriComponentsBuilder componentsBuilder) {
         Person person = personDTO.getPerson();
         Person existingPerson = Person.findById(person.getId());
         existingPerson.makeLike(person);
+        URI uri = componentsBuilder.pathSegment("persons", id).build().toUri();
+        PersonWebSocketTopic.enqueueNotification(ChangeType.UPDATED, uri);
     }
 
     @DeleteMapping(path = "/persons/{id}")
     @ResponseStatus(code = HttpStatus.OK)
-    public void removePerson(@PathVariable(name = "id", required = true) final String id) {
+    public void removePerson(@PathVariable(name = "id", required = true) final String id, final UriComponentsBuilder componentsBuilder) {
         Person.findById(id).delete();
+        URI uri = componentsBuilder.pathSegment("persons", id).build().toUri();
+        PersonWebSocketTopic.enqueueNotification(ChangeType.REMOVED, uri);
     }
 }
