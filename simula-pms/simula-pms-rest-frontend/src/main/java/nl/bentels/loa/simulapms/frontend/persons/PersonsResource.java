@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -199,6 +200,7 @@ public class PersonsResource {
         }
     }
 
+    @Transactional
     @PutMapping(path = "/persons/{id}", consumes = { "application/json" })
     @ResponseStatus(code = HttpStatus.OK)
     public void updatePerson(@RequestBody(required = true) final PersonDTO personDTO, @PathVariable(name = "id", required = true) final String id,
@@ -210,6 +212,7 @@ public class PersonsResource {
         PersonWebSocketTopic.enqueueNotification(ChangeType.UPDATED, uri);
     }
 
+    @Transactional
     @DeleteMapping(path = "/persons/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public void removePerson(@PathVariable(name = "id", required = true) final String id, final UriComponentsBuilder componentsBuilder) {
