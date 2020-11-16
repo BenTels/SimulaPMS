@@ -1,7 +1,9 @@
 package nl.bentels.loa.simulapms.frontend.persons;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.neovisionaries.i18n.CountryCode;
 
 import nl.bentels.loa.simulapms.frontend.persons.PersonWebSocketTopic.ChangeType;
+import nl.bentels.loa.simulapms.frontend.persons.PersonsResource.PersonDTO.PersonAttributes;
 import nl.bentels.loa.simulapms.model.person.Address;
 import nl.bentels.loa.simulapms.model.person.AlreadyIdentifiedPersonException;
 import nl.bentels.loa.simulapms.model.person.NoSuchPersonException;
@@ -38,12 +44,49 @@ import nl.bentels.loa.simulapms.model.person.Person;
 import nl.bentels.loa.simulapms.model.person.PhoneNumber;
 
 @RestController
-@CrossOrigin(origins = "http://localhost.localdomain:3000", exposedHeaders = "Location")
+//@CrossOrigin(origins = "http://localhost.localdomain:3000", exposedHeaders = "Location")
+@CrossOrigin(origins = "*", exposedHeaders = "Location")
 public class PersonsResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonsResource.class);
+    private static final Logger       LOGGER        = LoggerFactory.getLogger(PersonsResource.class);
+
+    private static final ObjectReader OBJECT_READER = new ObjectMapper().reader();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static class PersonDTO {
+        public static enum PersonAttributes {
+            ID("id"),
+            AGE_CLASS("ageclass"),
+            LAST_NAME("lastname"),
+            FIRST_NAMES("firstnames"),
+            MIDDLE_NAMES("middlenames"),
+            EMAIL_ADDRESSES("emailaddresses"),
+            DATE_OF_BIRTH("dob"),
+            PHONENUMBERS("phonenumbers"),
+            PHONENUMBERS_NUMBER("number"),
+            PHONENUMBERS_IS_MOBILE("mobile"),
+            CORRESPONDENCE_ADDRESS("mainCorrespondenceAddress"),
+            BILLING_ADDRESS("billingAddress"),
+            ADDRESS_COUNTRY("country"),
+            ADDRESS_LINES("lines"),
+            UNKNOWN("____UNKNOWN____");
+
+            private final String attributeName;
+
+            private PersonAttributes(final String attributeName) {
+                this.attributeName = attributeName;
+            }
+
+            public String getAttributeName() {
+                return attributeName;
+            }
+
+            public static PersonAttributes fromAttributeName(final String s) {
+                return Arrays.stream(PersonAttributes.values()).filter(pa -> pa.getAttributeName().equals(s)).findFirst().orElse(UNKNOWN);
+            }
+
+        }
+
         @JsonIgnore
         private Person              person;
         @JsonAnySetter
@@ -58,32 +101,33 @@ public class PersonsResource {
         @JsonAnyGetter
         public Map<String, Object> getProperties() {
             Map<String, Object> properties = new HashMap<>();
-            properties.put("id", person.getId());
-            properties.put("ageclass", person.getAgeClassNow().name());
-            properties.put("lastname", person.getLastName());
+            properties.put(PersonAttributes.ID.getAttributeName(), person.getId());
+            properties.put(PersonAttributes.AGE_CLASS.getAttributeName(), person.getAgeClassNow().name());
+            properties.put(PersonAttributes.LAST_NAME.getAttributeName(), person.getLastName());
             if (person.getFirstNames() != null) {
-                properties.put("firstnames", person.getFirstNames());
+                properties.put(PersonAttributes.FIRST_NAMES.getAttributeName(), person.getFirstNames());
             }
             if (person.getMiddleNames() != null) {
-                properties.put("middlenames", person.getMiddleNames());
+                properties.put(PersonAttributes.MIDDLE_NAMES.getAttributeName(), person.getMiddleNames());
             }
             if (person.getEmailAddresses() != null) {
-                properties.put("emailaddresses", person.getEmailAddresses());
+                properties.put(PersonAttributes.EMAIL_ADDRESSES.getAttributeName(), person.getEmailAddresses());
             }
             if (person.getDateOfBirth() != null) {
-                properties.put("dob", person.getDateOfBirth().toString());
+                properties.put(PersonAttributes.DATE_OF_BIRTH.getAttributeName(), person.getDateOfBirth().toString());
             }
             if (person.getPhoneNumbers() != null) {
-                properties.put("phonenumbers",
+                properties.put(PersonAttributes.PHONENUMBERS.getAttributeName(),
                         person.getPhoneNumbers().stream()
-                                .map(pn -> Map.of("number", pn.getPhoneNumber(), "mobile", pn.isMobile()))
+                                .map(pn -> Map.of(PersonAttributes.PHONENUMBERS_NUMBER.getAttributeName(), pn.getPhoneNumber(),
+                                        PersonAttributes.PHONENUMBERS_IS_MOBILE.getAttributeName(), pn.isMobile()))
                                 .collect(Collectors.toList()));
             }
             if (person.getCorrespondenceAddress() != null) {
-                properties.put("mainCorrespondenceAddress", toJSONObject(person.getCorrespondenceAddress()));
+                properties.put(PersonAttributes.CORRESPONDENCE_ADDRESS.getAttributeName(), toJSONObject(person.getCorrespondenceAddress()));
             }
             if (person.getBillingAddress() != null) {
-                properties.put("billingAddress", toJSONObject(person.getBillingAddress()));
+                properties.put(PersonAttributes.BILLING_ADDRESS.getAttributeName(), toJSONObject(person.getBillingAddress()));
             }
 
             return properties;
@@ -95,25 +139,26 @@ public class PersonsResource {
 
         private Person mapToPerson() {
             return Person.builder()
-                    .id((String) map.get("id"))
-                    .lastName((String) map.get("lastname"))
-                    .firstNames(emptyListObjectToNull("firstnames"))
-                    .middleNames(emptyListObjectToNull("middlenames"))
-                    .emailAddresses(emptyListObjectToNull("emailaddresses"))
-                    .dateOfBirth(toLocalDate((String) map.get("dob")))
+                    .id((String) map.get(PersonAttributes.ID.getAttributeName()))
+                    .lastName((String) map.get(PersonAttributes.LAST_NAME.getAttributeName()))
+                    .firstNames(emptyListObjectToNull(PersonAttributes.FIRST_NAMES.getAttributeName()))
+                    .middleNames(emptyListObjectToNull(PersonAttributes.MIDDLE_NAMES.getAttributeName()))
+                    .emailAddresses(emptyListObjectToNull(PersonAttributes.EMAIL_ADDRESSES.getAttributeName()))
+                    .dateOfBirth(toLocalDate((String) map.get(PersonAttributes.DATE_OF_BIRTH.getAttributeName())))
                     .phoneNumbers(phoneNumbersToList())
-                    .correspondenceAddress(toAddress((Map<String, Object>) map.get("mainCorrespondenceAddress")))
-                    .billingAddress(toAddress((Map<String, Object>) map.get("billingAddress")))
+                    .correspondenceAddress(toAddress((Map<String, Object>) map.get(PersonAttributes.CORRESPONDENCE_ADDRESS.getAttributeName())))
+                    .billingAddress(toAddress((Map<String, Object>) map.get(PersonAttributes.BILLING_ADDRESS.getAttributeName())))
                     .build();
 
         }
 
         private List<PhoneNumber> phoneNumbersToList() {
-            Object list0 = map.getOrDefault("phonenumbers", List.of());
+            Object list0 = map.getOrDefault(PersonAttributes.PHONENUMBERS.getAttributeName(), List.of());
             if (list0 != null) {
                 List<PhoneNumber> list = ((List<Map<String, Object>>) list0).stream()
-                        .filter(pnm -> StringUtils.isNotBlank((String) pnm.get("number")))
-                        .map(pnm -> new PhoneNumber((String) pnm.get("number"), (Boolean) pnm.get("mobile")))
+                        .filter(pnm -> StringUtils.isNotBlank((String) pnm.get(PersonAttributes.PHONENUMBERS_NUMBER.getAttributeName())))
+                        .map(pnm -> new PhoneNumber((String) pnm.get(PersonAttributes.PHONENUMBERS_NUMBER.getAttributeName()),
+                                (Boolean) pnm.get(PersonAttributes.PHONENUMBERS_IS_MOBILE.getAttributeName())))
                         .collect(Collectors.toList());
                 return list.isEmpty() ? null : list;
             }
@@ -140,8 +185,8 @@ public class PersonsResource {
             if (addressMap == null) {
                 return null;
             } else {
-                CountryCode countryCode = CountryCode.valueOf((String) addressMap.get("country"));
-                List<String> addressLines = emptyListToNull((List<String>) addressMap.get("lines"));
+                CountryCode countryCode = CountryCode.valueOf((String) addressMap.get(PersonAttributes.ADDRESS_COUNTRY.getAttributeName()));
+                List<String> addressLines = emptyListToNull((List<String>) addressMap.get(PersonAttributes.ADDRESS_LINES.getAttributeName()));
                 return countryCode != null && addressLines != null ? Address.builder()
                         .countryCode(countryCode)
                         .addressLines(addressLines)
@@ -157,12 +202,55 @@ public class PersonsResource {
         }
 
         private Map<String, Object> toJSONObject(final Address address) {
-            Map<String, Object> addressMap = Map.of("country", address.getCountryCode().name());
+            Map<String, Object> addressMap = Map.of(PersonAttributes.ADDRESS_COUNTRY.getAttributeName(), address.getCountryCode().name());
             if (address.getAddressLines() != null && !address.getAddressLines().isEmpty()) {
                 addressMap = new HashMap<>(addressMap);
-                addressMap.put("lines", address.getAddressLines());
+                addressMap.put(PersonAttributes.ADDRESS_LINES.getAttributeName(), address.getAddressLines());
             }
             return addressMap;
+        }
+    }
+
+    public static class PhoneNumberDTO {
+        private String  number;
+        private boolean mobile;
+
+        public void setNumber(final String number) {
+            this.number = number;
+        }
+
+        public void setMobile(final boolean mobile) {
+            this.mobile = mobile;
+        }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public boolean isMobile() {
+            return mobile;
+        }
+
+    }
+
+    public static class AddressDTO {
+        private List<String> lines;
+        private CountryCode  country;
+
+        public void setLines(final List<String> lines) {
+            this.lines = lines;
+        }
+
+        public void setCountry(final CountryCode country) {
+            this.country = country;
+        }
+
+        public List<String> getLines() {
+            return lines;
+        }
+
+        public CountryCode getCountry() {
+            return country;
         }
     }
 
@@ -213,11 +301,66 @@ public class PersonsResource {
     }
 
     @Transactional
+    @PutMapping(path = "/persons/{id}/{field}", consumes = { "application/json", "text/plain" })
+    @ResponseStatus(code = HttpStatus.OK)
+    public void updatePersonField(@RequestBody(required = true) final String newVal, @PathVariable(name = "id", required = true) final String id,
+            @PathVariable(name = "field", required = true) final String attributeName,
+            final UriComponentsBuilder componentsBuilder) {
+        Person existingPerson = Person.findById(id);
+        switch (PersonAttributes.fromAttributeName(attributeName)) {
+        case LAST_NAME -> existingPerson.withCorrectedLastName(newVal);
+        case DATE_OF_BIRTH -> existingPerson.withCorrectedDateOfBirth(LocalDate.parse(newVal));
+        case FIRST_NAMES -> existingPerson.withCorrectedFirstNames(jsonToArrayOfString(newVal));
+        case MIDDLE_NAMES -> existingPerson.withCorrectedMiddleNames(jsonToArrayOfString(newVal));
+        case EMAIL_ADDRESSES -> existingPerson.withCorrectedEmailAddresses(jsonToArrayOfString(newVal));
+        case PHONENUMBERS -> existingPerson.withCorrectedPhoneNumbers(jsonToArrayOfPhoneNumber(newVal));
+        case CORRESPONDENCE_ADDRESS -> existingPerson.withCorrectedCorrespondenceAddress(jsonToAddress(newVal));
+        case BILLING_ADDRESS -> existingPerson.withCorrectedBillingAddress(jsonToAddress(newVal));
+        default -> throw new IllegalArgumentException("Invalid person attribute name");
+        }
+        URI uri = componentsBuilder.pathSegment("persons", id).build().toUri();
+        PersonWebSocketTopic.enqueueNotification(ChangeType.UPDATED, uri);
+    }
+
+    @Transactional
     @DeleteMapping(path = "/persons/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public void removePerson(@PathVariable(name = "id", required = true) final String id, final UriComponentsBuilder componentsBuilder) {
         Person.findById(id).delete();
         URI uri = componentsBuilder.pathSegment("persons", id).build().toUri();
         PersonWebSocketTopic.enqueueNotification(ChangeType.REMOVED, uri);
+    }
+
+    private String[] jsonToArrayOfString(final String newVal) {
+        try {
+            return OBJECT_MAPPER.readValue(newVal, new TypeReference<String[]>() {
+            });
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private PhoneNumber[] jsonToArrayOfPhoneNumber(final String newVal) {
+        try {
+            List<PhoneNumberDTO> list = OBJECT_MAPPER.readValue(newVal, new TypeReference<List<PhoneNumberDTO>>() {
+            });
+            PhoneNumber[] array = list.stream()
+                    .map(pdto -> new PhoneNumber(pdto.getNumber(), pdto.isMobile()))
+                    .collect(Collectors.toList())
+                    .toArray(new PhoneNumber[] {});
+            return array;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private Address jsonToAddress(final String newVal) {
+        try {
+            AddressDTO adto = OBJECT_MAPPER.readValue(newVal, new TypeReference<AddressDTO>() {
+            });
+            return Address.builder().countryCode(adto.getCountry()).addressLines(adto.getLines()).build();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

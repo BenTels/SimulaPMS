@@ -2,7 +2,10 @@ package nl.bentels.loa.simulapms.model.person;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -91,6 +94,16 @@ public class PersonRepositoryAccessProvidingAspect {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    @Pointcut("execution(* nl.bentels.loa.simulapms.model.person.Person.withCorrected*(..)) && args(o)")
+    public void fieldUpdatePointcut(final Object o) {
+    }
+
+    @AfterReturning(pointcut = "fieldUpdatePointcut(o)", returning = "person")
+    public void doFieldUpdate(final Object o, final Person person, final JoinPoint jp) {
+        String attributeName = StringUtils.uncapitalize(jp.getSignature().getName().replaceAll("withCorrected", ""));
+        repository.update(person, attributeName, o);
     }
 
 }

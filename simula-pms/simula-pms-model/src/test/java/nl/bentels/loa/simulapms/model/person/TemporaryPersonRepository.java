@@ -28,4 +28,9 @@ public class TemporaryPersonRepository implements PersonRepository {
     public void remove(final Person person) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    @Override
+    public void update(final Person person, final String field, final Object newValue) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

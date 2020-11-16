@@ -12,5 +12,7 @@ public interface PersonRepository {
 
     void update(Person person);
 
+    void update(Person person, String field, Object newValue);
+
     void remove(Person person);
 }

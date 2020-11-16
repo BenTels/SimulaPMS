@@ -31,6 +31,13 @@ public class ErrorHandingControllerAdvice extends ResponseEntityExceptionHandler
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, req);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgument(final IllegalArgumentException iae, final WebRequest req) {
+        String body = String.format(ERROR_TEMPLATE, HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), iae.getMessage());
+        return handleExceptionInternal(iae, body,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, req);
+    }
+
     @ExceptionHandler(NoSuchPersonException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public void handlePersonNotFound(final NoSuchPersonException nspe) {
