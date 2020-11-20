@@ -9,17 +9,6 @@
 	</parent>
 	<artifactId>simula-pms-model</artifactId>
 	<name>SimulaPMS :: Domain Model</name>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
-				<configuration>
-					<argLine>-javaagent:/home/bzt/.m2/repository/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar</argLine>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

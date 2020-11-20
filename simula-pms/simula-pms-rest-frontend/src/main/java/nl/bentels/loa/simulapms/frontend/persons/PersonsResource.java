@@ -44,7 +44,6 @@ import nl.bentels.loa.simulapms.model.person.Person;
 import nl.bentels.loa.simulapms.model.person.PhoneNumber;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost.localdomain:3000", exposedHeaders = "Location")
 @CrossOrigin(origins = "*", exposedHeaders = "Location")
 public class PersonsResource {
 
