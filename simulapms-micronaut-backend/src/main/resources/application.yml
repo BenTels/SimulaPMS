@@ -1,0 +1,4 @@
+micronaut:
+  application:
+    name: simulapms-micronaut-backend
+mongodb.uri: mongodb+srv://bzt:bztPasswd@cluster-bzt-test-0.ew5ad.mongodb.net/test

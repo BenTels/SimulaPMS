@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: simulapms.micronaut.backend
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [app-name, http-client, java, java-application, junit, logback, maven, mongo-reactive, mongo-sync, netty-server, readme, shade, testcontainers, yaml]
