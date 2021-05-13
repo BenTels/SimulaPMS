@@ -27,6 +27,8 @@ hs_err_pid*
 .settings/
 **/target/
 .classpath
+**/.externalToolBuilders/
 
 # Mapstruct
 .factorypath
+/.metadata/
