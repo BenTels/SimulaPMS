@@ -1,4 +1,12 @@
+endpoints:
+  routes:
+    enabled: true
+    sensitive: false
 micronaut:
   application:
     name: simulapms-micronaut-backend
+  server:
+    cors:
+      enabled: true
+    idle-timeout: -1m
 mongodb.uri: mongodb+srv://bzt:bztPasswd@cluster-bzt-test-0.ew5ad.mongodb.net/test

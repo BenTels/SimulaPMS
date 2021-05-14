@@ -17,6 +17,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.InsertOneResult;
 
+import nl.bentels.test.persons.changenotification.CausesClientNotification;
 import nl.bentels.test.persons.pojodomain.Person;
 
 @Singleton
@@ -41,6 +42,14 @@ public class PersonRepository {
 		person.setId(key);
 		InsertOneResult insertOne = getCollection().insertOne(person);
 		return Optional.ofNullable(insertOne.getInsertedId().asString().getValue().toString());
+	}
+	
+	public void updatePerson(Person person) {
+		
+	}
+	
+	public void removePerson(Person person) {
+		
 	}
 	
 	private MongoCollection<Person> getCollection() {

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.neovisionaries.i18n.CountryCode;
 
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
@@ -21,6 +22,7 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.web.router.RouteBuilder.UriNamingStrategy;
+import nl.bentels.test.persons.changenotification.CausesClientNotification;
 import nl.bentels.test.persons.pojodomain.Address;
 import nl.bentels.test.persons.pojodomain.Person;
 import nl.bentels.test.persons.pojodomain.PhoneNumber;
@@ -50,7 +52,8 @@ public class PersonsController {
 	}
 
 	@Post("/")
-	public HttpResponse<String> processPerson(Person person) {
+	@CausesClientNotification
+	public HttpResponse<String> processPerson(Person person, HttpRequest<?> request) {
 		if (StringUtils.isNotBlank(person.getId())) {
 			return HttpResponse.badRequest("A new person may not specify an ID");
 		}
@@ -65,12 +68,20 @@ public class PersonsController {
 	}
 
 	@Put("/{id}")
-	public void updatePerson(Person p, String id) {
-
+	@CausesClientNotification
+	public HttpResponse<String> updatePerson(Person p, String id, HttpRequest<?> request) {
+		HttpResponse<String> result = HttpResponse.ok();
+		if (id.equals(p.getId())) {
+			personRepository.updatePerson(p);
+		} else {
+			result = HttpResponse.badRequest("Wrong person identified in update request");
+		}
+		return result;
 	}
 
 	@Delete("/{id}")
-	public void removePerson(String id) {
+	@CausesClientNotification
+	public void removePerson(String id, HttpRequest<?> request) {
 
 	}
 
