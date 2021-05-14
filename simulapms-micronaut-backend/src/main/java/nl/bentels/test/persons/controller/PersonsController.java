@@ -27,6 +27,8 @@ import nl.bentels.test.persons.pojodomain.Address;
 import nl.bentels.test.persons.pojodomain.Person;
 import nl.bentels.test.persons.pojodomain.PhoneNumber;
 import nl.bentels.test.persons.repository.PersonRepository;
+import nl.bentels.test.persons.repository.PersonUpdateFailedException;
+import nl.bentels.test.persons.repository.UnknownPersonException;
 
 @Controller("/persons")
 public class PersonsController {
@@ -72,7 +74,13 @@ public class PersonsController {
 	public HttpResponse<String> updatePerson(Person p, String id, HttpRequest<?> request) {
 		HttpResponse<String> result = HttpResponse.ok();
 		if (id.equals(p.getId())) {
-			personRepository.updatePerson(p);
+			try {
+				personRepository.updatePerson(p);
+			} catch (UnknownPersonException e) {
+				result = HttpResponse.notFound();
+			} catch (PersonUpdateFailedException e) {
+				result = HttpResponse.serverError();
+			}
 		} else {
 			result = HttpResponse.badRequest("Wrong person identified in update request");
 		}
@@ -82,7 +90,7 @@ public class PersonsController {
 	@Delete("/{id}")
 	@CausesClientNotification
 	public void removePerson(String id, HttpRequest<?> request) {
-
+		personRepository.removePerson(id);
 	}
 
 }
