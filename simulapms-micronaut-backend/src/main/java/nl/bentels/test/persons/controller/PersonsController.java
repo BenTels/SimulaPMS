@@ -21,6 +21,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.web.router.RouteBuilder.UriNamingStrategy;
 import nl.bentels.test.persons.changenotification.CausesClientNotification;
 import nl.bentels.test.persons.pojodomain.Address;
@@ -44,8 +45,8 @@ public class PersonsController {
 	}
 
 	@Get("/")
-	public List<Person> getAllPersons() {
-		return personRepository.findAll();
+	public List<Person> getAllPersons(@QueryValue(value="searchTerm", defaultValue = "") final String searchTerm) {
+		return personRepository.findAll().stream().filter(p -> StringUtils.isBlank(searchTerm) || p.getLastname().toLowerCase().contains(searchTerm.trim().toLowerCase())).toList();
 	}
 
 	@Get("/{id}")
