@@ -156,6 +156,7 @@
 						<goals>
 							<goal>build</goal>
 						</goals>
+						<phase>install</phase>
 					</execution>
 				</executions>
 				<configuration>
