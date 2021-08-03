@@ -9,11 +9,11 @@
 	<name>SimulaPMS</name>
 	<properties>
 		<java.validation.impl.version>6.1.6.Final</java.validation.impl.version>
-		<aspectj.version>1.9.6</aspectj.version>
-		<junit.version>5.7.0</junit.version>
-		<spring.version>5.3.7</spring.version>
-		<spring.boot.version>2.4.5</spring.boot.version>
-		<mapstruct.version>1.4.1.Final</mapstruct.version>
+		<aspectj.version>1.9.7</aspectj.version>
+		<junit.version>5.7.2</junit.version>
+		<spring.version>5.3.9</spring.version>
+		<spring.boot.version>2.5.3</spring.boot.version>
+		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 		<repo.path>${settings.localRepository}</repo.path>
 	</properties>
@@ -24,7 +24,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<release>15</release>
+					<release>16</release>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
@@ -45,7 +45,7 @@
 				<version>2.22.2</version>
 				<configuration>
 					<forkCount>0</forkCount>
-					<argLine>-javaagent:${repo.path}/org/springframework/spring-instrument/5.2.9.RELEASE/spring-instrument-5.2.9.RELEASE.jar -javaagent:${repo.path}/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar</argLine>
+					<argLine>-javaagent:${repo.path}/org/springframework/spring-instrument/5.2.9.RELEASE/spring-instrument-5.2.9.RELEASE.jar -javaagent:${repo.path}/org/aspectj/aspectjweaver/1.9.7/aspectjweaver-1.9.7.jar</argLine>
 					<useSystemClassloader>true</useSystemClassloader>
 				</configuration>
 			</plugin>
