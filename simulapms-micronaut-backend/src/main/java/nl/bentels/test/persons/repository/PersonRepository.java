@@ -5,21 +5,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.inject.Singleton;
-
 import org.bson.BsonString;
-import org.bson.Document;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.DeleteOptions;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
-import nl.bentels.test.persons.changenotification.CausesClientNotification;
+import jakarta.inject.Singleton;
 import nl.bentels.test.persons.pojodomain.Person;
 
 @Singleton

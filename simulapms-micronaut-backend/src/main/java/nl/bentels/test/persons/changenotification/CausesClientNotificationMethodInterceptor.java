@@ -5,18 +5,14 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import javax.inject.Singleton;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.micronaut.aop.InterceptorBean;
 import io.micronaut.aop.MethodInterceptor;
 import io.micronaut.aop.MethodInvocationContext;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.server.HttpServerConfiguration.HostResolutionConfiguration;
 import io.micronaut.http.server.util.HttpHostResolver;
 import io.micronaut.web.router.RouteBuilder.UriNamingStrategy;
+import jakarta.inject.Singleton;
 import nl.bentels.test.persons.changenotification.PersonChangeNotifier.ChangeType;
 import nl.bentels.test.persons.controller.PersonsController;
 import nl.bentels.test.persons.pojodomain.Person;
